@@ -21,13 +21,16 @@ public class WorldCursor : MonoBehaviour
 
         RaycastHit hitInfo;
 
+        // headPostion : origin
+        // gazeDirection : direction
+        // hitInfo : Raycast hit information
         if (Physics.Raycast(headPosition, gazeDirection, out hitInfo))
         {
             // If the raycast hit a hologram...
             // Display the cursor mesh.
             meshRenderer.enabled = true;
 
-            // Move thecursor to the point where the raycast hit.
+            // Move the cursor to the point where the raycast hit.
             this.transform.position = hitInfo.point;
 
             // Rotate the cursor to hug the surface of the hologram.

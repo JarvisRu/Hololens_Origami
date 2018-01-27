@@ -10,6 +10,9 @@ public class GazeGestureManager : MonoBehaviour
 
     GestureRecognizer recognizer;
 
+
+    bool updateFocusedObject = true;
+
     // Use this for initialization
     void Start()
     {
@@ -17,20 +20,55 @@ public class GazeGestureManager : MonoBehaviour
 
         // Set up a GestureRecognizer to detect Select gestures.
         recognizer = new GestureRecognizer();
+        recognizer.SetRecognizableGestures(GestureSettings.Hold | GestureSettings.Tap);
+
         recognizer.Tapped += (args) =>
         {
             // Send an OnSelect message to the focused object and its ancestors.
+            // Ignore the error
             if (FocusedObject != null)
             {
                 FocusedObject.SendMessageUpwards("OnSelect", SendMessageOptions.DontRequireReceiver);
             }
         };
+
+        recognizer.HoldStartedEvent += (source, ray) =>
+        {
+            if (FocusedObject != null)
+            {
+                updateFocusedObject = false;
+                FocusedObject.SendMessageUpwards("OnHoldStart", SendMessageOptions.DontRequireReceiver);
+            }
+        };
+        recognizer.HoldCompletedEvent += (source, ray) =>
+        {
+            if (FocusedObject != null)
+            {
+                updateFocusedObject = true;
+                FocusedObject.SendMessageUpwards("OnHoldCompleted", SendMessageOptions.DontRequireReceiver);
+            }
+        };
+
+        recognizer.HoldCanceledEvent += (source, ray) =>
+        {
+            if (FocusedObject != null)
+            {
+                updateFocusedObject = true;
+                FocusedObject.SendMessageUpwards("OnHoldCompleted", SendMessageOptions.DontRequireReceiver);
+            }
+        };
+
         recognizer.StartCapturingGestures();
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (!updateFocusedObject)
+        {
+            return;
+        }
+
         // Figure out which hologram is focused this frame.
         GameObject oldFocusObject = FocusedObject;
 

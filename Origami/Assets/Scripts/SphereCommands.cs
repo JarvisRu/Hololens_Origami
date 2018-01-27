@@ -23,7 +23,7 @@ public class SphereCommands : MonoBehaviour
     }
 
     // Called by SpeechManager when the user says the "Reset world" command
-    void OnReset()
+    public void OnReset()
     {
         // If the sphere has a Rigidbody component, remove it to disable physics.
         var rigidbody = this.GetComponent<Rigidbody>();
